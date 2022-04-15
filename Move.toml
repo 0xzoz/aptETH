@@ -3,8 +3,7 @@ name = "aptETH"
 version = "0.0.0"
 
 [addresses]
-aptETH = "0xe74"
-Pontis = ""
+Pontis = "0x02"
 
 [dependencies]
 AptosFramework = { local = "../framework/aptos-framework" }
