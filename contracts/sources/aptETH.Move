@@ -9,9 +9,9 @@ module Pontis::aptETH {
     use Std::Event::{Self, EventHandle};
     use Std::Option::{Self, Option};
 
-    use CoreFramework::SystemAddresses;
+    use AptosFramework::SystemAddresses;
 
-    friend AptosFramework::TransactionFee;
+    use AptosFramework::TransactionFee;
 
     /// Error codes
     const EINSUFFICIENT_BALANCE: u64 = 0;

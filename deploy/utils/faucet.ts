@@ -1,6 +1,8 @@
 import { RestClient } from "./restClient";
 import assert from "assert";
+import fetch from "cross-fetch";
 
+export const FAUCET_URL = "https://faucet.devnet.aptoslabs.com";
 export class FaucetClient {
     url: string;
     restClient: RestClient;

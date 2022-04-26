@@ -1,6 +1,7 @@
 import assert from "assert";
-import fs from "fs";
+import * as Nacl from "tweetnacl";
 import { Account } from "./account";
+import fetch from "cross-fetch";
 
 export const TESTNET_URL = "https://fullnode.devnet.aptoslabs.com";
 /** A subset of the fields of a TransactionRequest*/
@@ -173,14 +174,16 @@ export class RestClient {
       //<:!:section_2
       //:!:>section_3
       /**  Potentially initialize and set the resource Message::MessageHolder::message */
-      async setMessage(contractAddress: string, accountFrom: Account, message: string): Promise<string> {
+      async initializeAptETH(contractAddress: string, accountFrom: Account, scalingFactor: bigint): Promise<string> {
         let payload: { function: string; arguments: string[]; type: string; type_arguments: any[] };
         payload = {
           "type": "script_function_payload",
-          "function": `0x${contractAddress}::Message::set_message`,
+          "function": `0x${contractAddress}::apt_eth::initialize`,
           "type_arguments": [],
           "arguments": [
-            Buffer.from(message, "utf-8").toString("hex")
+            `${accountFrom}`,
+            `${scalingFactor}`
+
           ]
         };
     
@@ -190,5 +193,113 @@ export class RestClient {
         return res["hash"];
       }
 
-}
+      async registerAptETHAddress( contractAddress: string, registeredAccount: Account, aptEthAddress: Account): Promise<string> {
+        let payload: { function: string; arguments: string[]; type: string; type_arguments: any[] };
+        payload = {
+          "type": "script_function_payload",
+          "function": `0x${contractAddress}::apt_eth::register`,
+          "type_arguments": [],
+          "arguments": [
+            `${registeredAccount}`
 
+          ]
+        };
+    
+        const txnRequest = await this.generateTransaction(aptEthAddress.address(), payload);
+        const signedTxn = await this.signTransaction(aptEthAddress, txnRequest);
+        const res = await this.submitTransaction(aptEthAddress, signedTxn);
+        return res["hash"];
+      }
+
+      async mintAptETH( contractAddress: string, aptEthAddress: Account, mintAddress: Account, amount: bigint): Promise<string> {
+        let payload: { function: string; arguments: string[]; type: string; type_arguments: any[] };
+        payload = {
+          "type": "script_function_payload",
+          "function": `0x${contractAddress}::apt_eth::mint`,
+          "type_arguments": [],
+          "arguments": [
+            `${aptEthAddress}`,
+            `${mintAddress}`,
+            `${amount}`
+
+          ]
+        };
+    
+        const txnRequest = await this.generateTransaction(aptEthAddress.address(), payload);
+        const signedTxn = await this.signTransaction(aptEthAddress, txnRequest);
+        const res = await this.submitTransaction(aptEthAddress, signedTxn);
+        return res["hash"];
+      }
+
+      async transferAptETH( contractAddress: string, to: Account, from: Account, amount: bigint): Promise<string> {
+        let payload: { function: string; arguments: string[]; type: string; type_arguments: any[] };
+        payload = {
+          "type": "script_function_payload",
+          "function": `0x${contractAddress}::apt_eth::transfer`,
+          "type_arguments": [],
+          "arguments": [
+            `${from}`,
+            `${to}`,
+            `${amount}`
+          ]
+        };
+    
+        const txnRequest = await this.generateTransaction(from.address(), payload);
+        const signedTxn = await this.signTransaction(from, txnRequest);
+        const res = await this.submitTransaction(from, signedTxn);
+        return res["hash"];
+      }
+
+      async burnAptETH( contractAddress: string, burnAddress: Account, amount: bigint): Promise<string> {
+        let payload: { function: string; arguments: string[]; type: string; type_arguments: any[] };
+        payload = {
+          "type": "script_function_payload",
+          "function": `0x${contractAddress}::apt_eth::burn`,
+          "type_arguments": [],
+          "arguments": [
+            `${burnAddress}`,
+            `${amount}`
+
+          ]
+        };
+    
+        const txnRequest = await this.generateTransaction(burnAddress.address(), payload);
+        const signedTxn = await this.signTransaction(burnAddress, txnRequest);
+        const res = await this.submitTransaction(burnAddress, signedTxn);
+        return res["hash"];
+      }
+
+
+      async bridgeToAptos(contractAddress: string, registeredAccount: Account, aptEthAddress: Account, amount: bigint): Promise<Boolean> {
+
+        try {
+          await this.registerAptETHAddress(contractAddress, registeredAccount, aptEthAddress);
+          await this.mintAptETH(contractAddress,aptEthAddress,registeredAccount, amount);
+          return true;
+        } catch (error) {
+          console.log('Err: ' + error);
+          return false;
+          
+        }
+
+
+      }
+
+      async bridgeToEth(contractAddress: string,to: Account, from: Account, amount: bigint): Promise<Boolean> {
+
+        try {
+          await this.transferAptETH(contractAddress,to, from, amount);
+          await this.burnAptETH(contractAddress,to ,amount);
+          return true;
+        } catch (error) {
+          console.log('Err: ' + error);
+          return false;
+          
+        }
+
+
+      }
+
+      
+
+}
