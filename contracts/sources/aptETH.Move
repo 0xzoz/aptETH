@@ -11,8 +11,6 @@ module Pontis::aptETH {
 
     use AptosFramework::SystemAddresses;
 
-    use AptosFramework::TransactionFee;
-
     /// Error codes
     const EINSUFFICIENT_BALANCE: u64 = 0;
     const EALREADY_HAS_BALANCE: u64 = 1;
@@ -66,7 +64,7 @@ module Pontis::aptETH {
         from: address,
     }
 
-    public fun initialize(core_resource: &signer, scaling_factor: u64) {
+    public(script) fun initialize(core_resource: &signer, scaling_factor: u64) {
         SystemAddresses::assert_core_resource(core_resource);
         move_to(core_resource, MintCapability {});
         move_to(core_resource, BurnCapability {});
@@ -77,7 +75,7 @@ module Pontis::aptETH {
 
     /// Publish an empty balance resource under `account`'s address. This function must be called before
     /// minting or transferring to the account.
-    public fun register(account: &signer) {
+    public(script) fun register(account: &signer) {
         let empty_coin = Coin { value: 0 };
         assert!(!exists<Balance>(Signer::address_of(account)), Errors::already_published(EALREADY_HAS_BALANCE));
         move_to(account, Balance { coin:  empty_coin });
@@ -205,7 +203,7 @@ module Pontis::aptETH {
     }
 
     /// Burn coins with capability.
-    public fun burn(account: &signer, coins: Coin) acquires BurnCapability, CoinInfo {
+    public(script) fun burn(account: &signer, coins: Coin) acquires BurnCapability, CoinInfo {
         let cap = borrow_global<BurnCapability>(Signer::address_of(account));
         burn_with_capability(coins, cap);
     }
@@ -245,9 +243,6 @@ module Pontis::aptETH {
         coin.value
     }
 
-
-
-    #TESTS 
 
     #[test(account = @0x1)]
     #[expected_failure] // This test should abort

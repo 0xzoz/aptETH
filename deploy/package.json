@@ -1,24 +1,25 @@
 {
-    "name": "aptos-apteth-deploy",
-    "description": "Wrapped ETH on the Aptos network",
-    "version": "0.0.1",
-    "homepage": "https://aptoslabs.com",
-    "repository": "https://github.com/0xzoz/aptETH/deploy",
-    "maintainers": [
-      "zoz<zeroexzoz@gmail.com"
-    ],
-    "license": "Apache-2.0",
-    "scripts": {
-      "first": "node --loader ts-node/esm first_transaction.ts",
-      "run": "node --loader ts-node/esm index.ts"
-    },
-    "keywords": [],
-    "dependencies": {
-      "@types/node": "^17.0.21",
-      "cross-fetch": "^3.1.5",
-      "js-sha3": "^0.8.0",
-      "ts-node": "^10.7.0",
-      "tweetnacl": "^1.0.3",
-      "typescript": "^4.6.2"
-    }
+  "name": "aptos-apteth-deploy",
+  "description": "Wrapped ETH on the Aptos network",
+  "version": "0.0.1",
+  "homepage": "https://aptoslabs.com",
+  "repository": "https://github.com/0xzoz/aptETH/deploy",
+  "maintainers": [
+    "zoz<zeroexzoz@gmail.com"
+  ],
+  "license": "Apache-2.0",
+  "scripts": {
+    "first": "node --loader ts-node/esm first_transaction.ts",
+    "run": "node --loader ts-node/esm index.ts"
+  },
+  "keywords": [],
+  "dependencies": {
+    "@types/node": "^17.0.21",
+    "cross-fetch": "^3.1.5",
+    "dotenv": "^16.0.0",
+    "js-sha3": "^0.8.0",
+    "ts-node": "^10.7.0",
+    "tweetnacl": "^1.0.3",
+    "typescript": "^4.6.2"
   }
+}
